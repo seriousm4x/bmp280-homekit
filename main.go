@@ -76,7 +76,7 @@ func updateHomeKit(
 	sensor *bmp280.Sensor,
 ) {
 	updateReading := func() {
-		temperature, pressure, err := sensor.Read()
+		temperature, _, err := sensor.Read()
 		if err != nil {
 			log.Printf("BMP280 read failed: %v", err)
 			return
@@ -85,7 +85,7 @@ func updateHomeKit(
 		accessory.TempSensor.CurrentTemperature.SetValue(temperature)
 		// Pressure is logged because this accessory currently has no native
 		// HomeKit pressure characteristic.
-		log.Printf("%.2f °C   %.2f hPa", temperature, pressure)
+		// log.Printf("%.2f °C   %.2f hPa", temperature, pressure)
 	}
 
 	updateReading()
