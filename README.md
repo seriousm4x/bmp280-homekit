@@ -40,6 +40,25 @@ The application prints the current temperature and pressure once per second. Pai
 
 The pairing database is created in `./db`. Keep this directory when upgrading or restarting the application, otherwise HomeKit pairing information will be lost.
 
+## Run with systemd
+
+The repository includes [`bmp280.service`](bmp280.service), which sets the working directory explicitly so `./db` resolves to `/opt/bmp280-homekit/db` instead of a systemd default directory.
+
+Install the application and service as follows:
+
+```sh
+sudo useradd --system --home /opt/bmp280-homekit --shell /usr/sbin/nologin bmp280
+sudo install -d -o bmp280 -g bmp280 /opt/bmp280-homekit
+sudo install -o bmp280 -g bmp280 bmp280 /opt/bmp280-homekit/bmp280
+sudo install -o bmp280 -g bmp280 -d /opt/bmp280-homekit/db
+sudo install -o root -g root -m 0644 bmp280.service /etc/systemd/system/bmp280.service
+sudo usermod -aG i2c bmp280
+sudo systemctl daemon-reload
+sudo systemctl enable --now bmp280.service
+```
+
+Keep `/opt/bmp280-homekit/db` when replacing the binary, otherwise HomeKit pairing information will be lost. Check the service with `sudo systemctl status bmp280.service` and view logs with `sudo journalctl -u bmp280.service`.
+
 ## Configuration
 
 The I2C bus and BMP280 address are currently constants in [`sensor/bmp280.go`](sensor/bmp280.go):
